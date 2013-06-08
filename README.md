@@ -1,7 +1,9 @@
 vows-batch-retry
 ================
 
-Add a ``addBatchRetry`` command to vows, for tests which involved lot of external components, and which can failed
+[![Build Status](https://travis-ci.org/bpaquet/vows-batch-retry.png?branch=master)](https://travis-ci.org/bpaquet/vows-batch-retry)
+
+Add a ``addBatchRetry`` command to [vows](http://vowsjs.org/), for tests which involved lot of external components, and which can failed
 sometimes.
 
 ## How to use it ?
