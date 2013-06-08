@@ -7,6 +7,7 @@ var callback_ep2_counter = 0;
 var callback_async_timeout_counter = 0;
 var callback_async_exception_counter = 0;
 var callback_aysnc_assert_counter = 0;
+var callback_aysnc_sync_assert_counter = 0;
 
 vows.describe('vows batch retry').addBatchRetry({
 //   'standard test': {
@@ -94,6 +95,20 @@ vows.describe('vows batch retry').addBatchRetry({
       assert.equal(t, "toto");
     }
   }
+}, 10, 500).addBatchRetry({
+  'callback async sync assert topic test': {
+    topic: function() {
+      var callback = this.callback;
+      callback_aysnc_sync_assert_counter += 1;
+      assert.equal(callback_aysnc_sync_assert_counter, 5);
+      setTimeout(function() {
+        callback(null, "toto");
+      }, 100);
+    },
+    assert_sync_check: function(t) {
+      assert.equal(t, "toto");
+    }
+  }
 }, 10, 200).addBatch({
   'check counters': {
     check_std_counter: function() {
@@ -113,6 +128,9 @@ vows.describe('vows batch retry').addBatchRetry({
     },
     check_callback_async_assert_counter: function() {
       assert.equal(callback_aysnc_assert_counter, 8);
+    },
+    check_callback_async_sync_assert_counter: function() {
+      assert.equal(callback_aysnc_sync_assert_counter, 5);
     },
   }
 }).export(module);
