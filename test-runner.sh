@@ -9,7 +9,11 @@ if [ "$TEST" = "" ]; then
 fi
 
 for test in $TEST; do
-  echo "Launching test : $test"
-   NODE_PATH=../lib vows $test --spec
-  echo ""
+  if [[ "$test" =~ "test_ok" ]]; then
+    echo "Launching test : $test"
+    NODE_PATH=../lib vows $test --spec
+  else
+    echo "Launching failing test : $test"
+    NODE_PATH=../lib vows $test --spec && exit 1
+  fi
 done

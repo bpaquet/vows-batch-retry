@@ -2,6 +2,7 @@ var vows = require('../lib/vows-batch-retry'),
     assert = require('assert');
 
 var std_counter = 0;
+var std_exception_counter = 0;
 var callback_counter = 0;
 var callback_ep2_counter = 0;
 var callback_async_timeout_counter = 0;
@@ -20,7 +21,18 @@ vows.describe('vows batch retry').addBatchRetry({
 //       assert.equal(std_counter, 3);
 //     }
 //   },
-// }).addBatchRetry(5, {
+// }, 5).addBatchRetry({
+//   'standard exception test': {
+//     topic: function() {
+//       std_exception_counter += 1;
+//       assert.equal(std_exception_counter, 2);
+//       return "toto";
+//     },
+//     my_check: function(t) {
+//       assert.equal("toto", t);
+//     }
+//   },
+// }, 5).addBatchRetry({
   'callback test': {
     topic: function() {
       var callback = this.callback;
@@ -109,11 +121,14 @@ vows.describe('vows batch retry').addBatchRetry({
       assert.equal(t, "toto");
     }
   }
-}, 10, 200).addBatch({
+}, 10, 50000).addBatch({
   'check counters': {
-    check_std_counter: function() {
-      // assert.equal(std_counter, 3);
-    },
+    // check_std_counter: function() {
+    //   assert.equal(std_counter, 3);
+    // },
+    // check_std_exception_counter: function() {
+    //   assert.equal(std_exception_counter, 2);
+    // },
     check_callback_counter: function() {
       assert.equal(callback_counter, 3);
     },
