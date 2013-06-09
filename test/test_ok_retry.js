@@ -2,6 +2,8 @@ var vows = require('../lib/vows-batch-retry'),
     assert = require('assert');
 
 var sync_counter = 0;
+var sync_two_func_counter = 0;
+var sync_two_func_reverse_counter = 0;
 var sync_exception_counter = 0;
 var async_final_assert_counter = 0;
 var async_final_assert_ep2_counter = 0;
@@ -21,6 +23,32 @@ vows.describe('vows batch retry').addBatchRetry({
       assert.equal(t, "toto");
       sync_counter += 1;
       assert.equal(sync_counter, 3);
+    }
+  },
+}, 5).addBatchRetry({
+  'sync test two func': {
+    topic: function() {
+      return "toto";
+    },
+    check1: function(t) {
+      assert.equal(t, "toto");
+    },
+    check2: function(t) {
+      sync_two_func_counter += 1;
+      assert.equal(sync_two_func_counter, 4);
+    }
+  },
+}, 5).addBatchRetry({
+  'sync test two func reverse': {
+    topic: function() {
+      return "toto";
+    },
+    check1: function(t) {
+      sync_two_func_reverse_counter += 1;
+      assert.equal(sync_two_func_reverse_counter, 2);
+    },
+    check2: function(t) {
+      assert.equal(t, "toto");
     }
   },
 }, 5).addBatchRetry({
@@ -167,6 +195,12 @@ vows.describe('vows batch retry').addBatchRetry({
   'check counters': {
     check_sync_counter: function() {
       assert.equal(sync_counter, 3);
+    },
+    check_sync_two_func_counter: function() {
+      assert.equal(sync_two_func_counter, 4);
+    },
+    check_sync_two_func_reverse_counter: function() {
+      assert.equal(sync_two_func_reverse_counter, 2);
     },
     check_sync_exception_counter: function() {
       assert.equal(sync_exception_counter, 2);
