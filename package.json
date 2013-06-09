@@ -1,7 +1,7 @@
 {
   "name": "vows-batch-retry",
   "description": "Add on to vows to add addBatchRetry command",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Bertrand Paquet <bertrand.paquet@gmail.com>",
   "keywords": ["vows", "bdd", "retry"],
   "main": "./lib/vows-batch-retry.js",
