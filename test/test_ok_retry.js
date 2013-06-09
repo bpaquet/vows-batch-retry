@@ -6,7 +6,9 @@ var sync_exception_counter = 0;
 var async_final_assert_counter = 0;
 var async_final_assert_ep2_counter = 0;
 var async_timeout_counter = 0;
-var async_exception_counter = 0;
+var async_exception_no_counter = 0;
+var async_exception_one_counter = 0;
+var async_exception_two_counter = 0;
 var aysnc_assert_counter = 0;
 var aysnc_sync_assert_counter = 0;
 
@@ -16,7 +18,7 @@ vows.describe('vows batch retry').addBatchRetry({
       return "toto";
     },
     sync_check: function(t) {
-      assert.equal("toto", t);
+      assert.equal(t, "toto");
       sync_counter += 1;
       assert.equal(sync_counter, 3);
     }
@@ -29,7 +31,7 @@ vows.describe('vows batch retry').addBatchRetry({
       return "toto";
     },
     sync_exception_check: function(t) {
-      assert.equal("toto", t);
+      assert.equal(t, "toto");
     }
   },
 }, 5).addBatchRetry({
@@ -40,7 +42,8 @@ vows.describe('vows batch retry').addBatchRetry({
         callback(null, "toto", 43);
       }, 100);
     },
-    cb_check: function(t, tt) {
+    cb_check: function(err, t, tt) {
+      assert.ifError(err);
       assert.equal(t, "toto");
       assert.equal(tt, 43);
       async_final_assert_counter += 1;
@@ -55,7 +58,8 @@ vows.describe('vows batch retry').addBatchRetry({
         callback(null, "toto");
       }, 100);
     },
-    cb_check: function(t) {
+    cb_check: function(err, t) {
+      assert.ifError(err);
       assert.equal(t, "toto");
       async_final_assert_ep2_counter += 1;
       assert.equal(async_final_assert_ep2_counter, 7);
@@ -71,26 +75,62 @@ vows.describe('vows batch retry').addBatchRetry({
         callback(null, "toto");
       }, wait);
     },
-    timeout_check: function(t) {
+    timeout_check: function(err, t) {
+      assert.ifError(err);
       assert.equal(t, "toto");
     }
   }
 }, 10, 200).addBatchRetry({
-  'async exception test': {
+  'async exception no args test': {
     topic: function() {
       var callback = this.callback;
       setTimeout(function() {
         var result = "myerror";
-        async_exception_counter += 1;
-        if (async_exception_counter == 4) {
+        async_exception_no_counter += 1;
+        if (async_exception_no_counter == 7) {
+          result = undefined;
+        }
+        callback(result);
+      }, 100);
+    },
+    exception_check: function() {
+      assert.equal(async_exception_no_counter, 7);
+    }
+  }
+}, 10, 500).addBatchRetry({
+  'async exception one args test': {
+    topic: function() {
+      var callback = this.callback;
+      setTimeout(function() {
+        var result = "myerror";
+        async_exception_one_counter += 1;
+        if (async_exception_one_counter == 5) {
+          result = undefined;
+        }
+        callback(result);
+      }, 100);
+    },
+    exception_check: function(err) {
+      assert.equal(async_exception_one_counter, 5);
+    }
+  }
+}, 10, 500).addBatchRetry({
+  'async exception two args test': {
+    topic: function() {
+      var callback = this.callback;
+      setTimeout(function() {
+        var result = "myerror";
+        async_exception_two_counter += 1;
+        if (async_exception_two_counter == 4) {
           result = undefined;
         }
         callback(result, "toto");
       }, 100);
     },
-    exception_check: function(t) {
+    exception_check: function(err, t) {
+      assert.ifError(err);
       assert.equal(t, "toto");
-      assert.equal(async_exception_counter, 4);
+      assert.equal(async_exception_two_counter, 4);
     }
   }
 }, 10, 500).addBatchRetry({
@@ -103,7 +143,8 @@ vows.describe('vows batch retry').addBatchRetry({
         callback(null, "toto");
       }, 100);
     },
-    assert_check: function(t) {
+    assert_check: function(err, t) {
+      assert.ifError(err);
       assert.equal(t, "toto");
     }
   }
@@ -117,7 +158,8 @@ vows.describe('vows batch retry').addBatchRetry({
         callback(null, "toto");
       }, 100);
     },
-    assert_sync_check: function(t) {
+    assert_sync_check: function(err, t) {
+      assert.ifError(err);
       assert.equal(t, "toto");
     }
   }
@@ -138,8 +180,14 @@ vows.describe('vows batch retry').addBatchRetry({
     check_async_timeout_counter: function() {
       assert.equal(async_timeout_counter, 6);
     },
-    check_async_exception_counter: function() {
-      assert.equal(async_exception_counter, 4);
+    check_async_exception_no_counter: function() {
+      assert.equal(async_exception_no_counter, 7);
+    },
+    check_async_exception_one_counter: function() {
+      assert.equal(async_exception_one_counter, 5);
+    },
+    check_async_exception_two_counter: function() {
+      assert.equal(async_exception_two_counter, 4);
     },
     check_async_assert_counter: function() {
       assert.equal(aysnc_assert_counter, 8);

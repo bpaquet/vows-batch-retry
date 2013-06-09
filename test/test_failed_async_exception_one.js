@@ -2,15 +2,15 @@ var vows = require('../lib/vows-batch-retry'),
     assert = require('assert');
 
 vows.describe('vows failed').addBatchRetry({
-  'async assert test': {
+  'async exception one args test': {
     topic: function() {
       var callback = this.callback;
       setTimeout(function() {
+        callback("titi");
       }, 100);
     },
-    cb_check: function(err, tt) {
+    cb_check: function(err) {
       assert.ifError(err);
-      assert.equal(t, "toto");
     }
   }
 }, 5, 100).export(module);
