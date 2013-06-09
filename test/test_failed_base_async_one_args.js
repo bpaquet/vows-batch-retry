@@ -1,7 +1,7 @@
 var vows = require('../lib/vows-batch-retry'),
     assert = require('assert');
 
-vows.describe('vows batch retry').addBatch({
+vows.describe('vows batch retry').addBatchRetry({
   'callback one args test': {
     topic: function() {
       var callback = this.callback;
@@ -12,4 +12,4 @@ vows.describe('vows batch retry').addBatch({
     cb_check: function(t) {
     }
   }
-}).export(module);
+}, 5, 100).export(module);

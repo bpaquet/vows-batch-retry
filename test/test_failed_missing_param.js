@@ -2,14 +2,15 @@ var vows = require('../lib/vows-batch-retry'),
     assert = require('assert');
 
 vows.describe('vows batch retry').addBatchRetry({
-  'callback no args test': {
+  'missing param': {
     topic: function() {
       var callback = this.callback;
       setTimeout(function() {
-        callback("toto");
+        callback();
       }, 100);
     },
-    cb_check: function() {
+    cb_check: function(err, t) {
+      assert.ifError(err);
     }
   }
-}, 5, 100).export(module);
+}).export(module);
